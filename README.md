@@ -2,6 +2,14 @@
 
 A full-stack personal finance dashboard built with Next.js 14, featuring real authentication, interactive charts, budget tracking, and financial goals.
 
+## 🔗 Live Demo
+
+https://fintrack-pro-nu.vercel.app/login
+
+**Demo credentials:**
+- Email: `demo@fintrack.dev`
+- Password: `Demo@123`
+
 ## Quick Start
 
 ```bash
@@ -16,12 +24,23 @@ Open [http://localhost:3000](http://localhost:3000) — you'll be redirected to 
 
 **Demo credentials:** `demo@fintrack.dev` / `Demo@123`
 
+## Environment Variables
+
+Create a `.env` file in the project root (never commit it — it's in `.gitignore`):
+
+```env
+DATABASE_URL="your_postgresql_url_here"   # PostgreSQL — Neon.tech recommended
+JWT_SECRET="your_long_random_string_here" # Any long random string
+```
+
+See `.env.example` for a reference template. For a free PostgreSQL database, create a project at [neon.tech](https://neon.tech) and paste the connection string as `DATABASE_URL`.
+
 ## Tech Stack
 
 | Layer | Choice | Rationale |
 |---|---|---|
 | Framework | Next.js 14 (App Router) | Full-stack in one repo, RSC, built-in routing |
-| Database | SQLite via Prisma 6 | Zero-config local dev, file-based, easy to seed |
+| Database | PostgreSQL via Prisma 6 | Hosted on Neon.tech, production-ready, easy to seed |
 | Auth | JWT + httpOnly cookies | No external service dependency, full control |
 | UI | Tailwind CSS + shadcn/ui | Rapid component assembly, accessible by default |
 | Charts | Recharts | Composable, works well with React state |
