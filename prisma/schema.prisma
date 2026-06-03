@@ -1,0 +1,119 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String        @id @default(cuid())
+  name         String
+  email        String        @unique
+  passwordHash String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  accounts     Account[]
+  transactions Transaction[]
+  categories   Category[]
+  budgets      Budget[]
+  goals        Goal[]
+  tags         Tag[]
+}
+
+model Account {
+  id           String        @id @default(cuid())
+  userId       String
+  name         String
+  type         String
+  balanceCents Int           @default(0)
+  color        String        @default("#3b82f6")
+  icon         String        @default("wallet")
+  isArchived   Boolean       @default(false)
+  createdAt    DateTime      @default(now())
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+}
+
+model Transaction {
+  id          String               @id @default(cuid())
+  userId      String
+  accountId   String
+  categoryId  String
+  amountCents Int
+  type        String
+  description String
+  date        DateTime
+  isRecurring Boolean              @default(false)
+  recurringId String?
+  notes       String?
+  createdAt   DateTime             @default(now())
+  user        User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account     Account              @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  category    Category             @relation(fields: [categoryId], references: [id])
+  tags        TagsOnTransactions[]
+}
+
+model Category {
+  id           String        @id @default(cuid())
+  userId       String
+  name         String
+  icon         String        @default("tag")
+  color        String        @default("#6b7280")
+  type         String
+  isDefault    Boolean       @default(false)
+  parentId     String?
+  parent       Category?     @relation("SubCategories", fields: [parentId], references: [id])
+  children     Category[]    @relation("SubCategories")
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+  budgets      Budget[]
+}
+
+model Budget {
+  id             String    @id @default(cuid())
+  userId         String
+  categoryId     String
+  amountCents    Int
+  periodType     String
+  startDate      DateTime
+  endDate        DateTime?
+  alertThreshold Float     @default(0.8)
+  createdAt      DateTime  @default(now())
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category       Category  @relation(fields: [categoryId], references: [id])
+}
+
+model Goal {
+  id                 String    @id @default(cuid())
+  userId             String
+  name               String
+  targetAmountCents  Int
+  currentAmountCents Int       @default(0)
+  deadline           DateTime?
+  icon               String    @default("target")
+  color              String    @default("#3b82f6")
+  isCompleted        Boolean   @default(false)
+  createdAt          DateTime  @default(now())
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Tag {
+  id           String               @id @default(cuid())
+  userId       String
+  name         String
+  color        String               @default("#6b7280")
+  user         User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions TagsOnTransactions[]
+}
+
+model TagsOnTransactions {
+  transactionId String
+  tagId         String
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  tag           Tag         @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([transactionId, tagId])
+}
