@@ -1,36 +1,84 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FinTrack Pro
 
-## Getting Started
+A full-stack personal finance dashboard built with Next.js 14, featuring real authentication, interactive charts, budget tracking, and financial goals.
 
-First, run the development server:
+## Quick Start
 
 ```bash
+npm install
+npx prisma generate
+npx prisma db push
+npx tsx prisma/seed.ts
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) — you'll be redirected to `/dashboard` after login.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**Demo credentials:** `demo@fintrack.dev` / `Demo@123`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Tech Stack
 
-## Learn More
+| Layer | Choice | Rationale |
+|---|---|---|
+| Framework | Next.js 14 (App Router) | Full-stack in one repo, RSC, built-in routing |
+| Database | SQLite via Prisma 6 | Zero-config local dev, file-based, easy to seed |
+| Auth | JWT + httpOnly cookies | No external service dependency, full control |
+| UI | Tailwind CSS + shadcn/ui | Rapid component assembly, accessible by default |
+| Charts | Recharts | Composable, works well with React state |
+| Validation | Zod | Shared schemas between frontend and backend |
+| Forms | react-hook-form | Performant, integrates cleanly with Zod |
 
-To learn more about Next.js, take a look at the following resources:
+## Architecture
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+app/
+  (auth)/           Login and register pages (no sidebar layout)
+  (dashboard)/      All protected pages with sidebar
+  api/              REST API routes — HTTP only, no business logic
+components/
+  charts/           Recharts wrappers (CashflowChart, CategoryDonutChart)
+  ui/               shadcn/ui base components
+lib/
+  auth.ts           JWT sign/verify/decode + cookie helpers
+  prisma.ts         Prisma client singleton
+  validators/       Zod schemas shared between API routes and forms
+services/           Business logic separated from HTTP handlers
+prisma/
+  schema.prisma     Database schema
+  seed.ts           Realistic 6-month seed data
+middleware.ts       Route protection — redirects unauthenticated users
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Key Technical Decisions
 
-## Deploy on Vercel
+**JWT over NextAuth** — Full control over the token lifecycle, simpler setup, no external provider dependencies.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+**Cents over floats** — All monetary values stored as integers (cents). Avoids IEEE 754 floating-point rounding errors in financial calculations.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Service layer pattern** — API routes handle HTTP concerns (parsing, status codes). Services handle business logic (balance updates, budget overlap validation). Easier to test and reason about independently.
+
+**Prisma 6 over Prisma 7** — Prisma 7 requires driver adapters for local SQLite which adds operational complexity. Prisma 6 has stable, zero-config SQLite support.
+
+**SQLite for development** — No Docker, no connection strings, no external DB. The seed script creates a realistic 6-month dataset in seconds.
+
+## Pages
+
+| Route | Description |
+|---|---|
+| `/dashboard` | KPI cards, cash flow chart, expenses by category, budget alerts, goals |
+| `/transactions` | Paginated table with filters, add/edit/delete, CSV export |
+| `/accounts` | Account cards with balance, add/archive |
+| `/budgets` | Budget progress bars with color-coded alerts |
+| `/goals` | Goal progress tracking with contribution modal |
+| `/analytics` | Monthly income vs expenses line chart, category breakdown |
+| `/settings` | Profile update, password change, category management, account deletion |
+
+## Seed Data
+
+The seed creates:
+- 1 user: `demo@fintrack.dev` / `Demo@123`
+- 3 accounts: Main Checking ($4,200), Savings ($12,500), Credit Card (-$850)
+- 10 default categories
+- 5 budgets (Food, Transport, Entertainment, Shopping, Health)
+- 3 goals: Emergency Fund (60%), Vacation (30%), New Laptop (90%)
+- 134 transactions across 6 months with realistic spending patterns
