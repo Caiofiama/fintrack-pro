@@ -3,7 +3,7 @@
 A full-stack personal finance dashboard built with Next.js 14, featuring real authentication, interactive charts, budget tracking, and financial goals.
 
 ## 🔗 Live Demo
-
+![alt text](image.png)
 https://fintrack-pro-nu.vercel.app/login
 
 **Demo credentials:**
