@@ -3,7 +3,16 @@ import { PrismaClient } from "../lib/generated/prisma";
 import bcrypt from "bcryptjs";
 import { subMonths, addDays } from "date-fns";
 
-const prisma = new PrismaClient();
+function getDatabaseUrl(): string {
+  const databaseUrl = process.env.DATABASE_URL;
+  if (!databaseUrl) throw new Error("DATABASE_URL is required to seed the database.");
+
+  const url = new URL(databaseUrl);
+  url.searchParams.set("schema", process.env.DATABASE_SCHEMA ?? "fintrack");
+  return url.toString();
+}
+
+const prisma = new PrismaClient({ datasources: { db: { url: getDatabaseUrl() } } });
 
 async function main() {
   // Clean slate
