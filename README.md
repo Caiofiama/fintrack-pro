@@ -1,6 +1,16 @@
 # FinTrack Pro
 
-A full-stack personal finance dashboard built with Next.js 14, featuring real authentication, interactive charts, budget tracking, and financial goals.
+A full-stack personal finance dashboard built with Next.js 14, PostgreSQL, Prisma, JWT authentication, interactive charts, budget tracking, and financial goals.
+
+## Documentation
+
+Use [the documentation hub](docs/README.md) to navigate the project:
+
+- [Local setup](docs/getting-started.md)
+- [Architecture](docs/architecture.md)
+- [API reference](docs/api.md)
+- [Data model](docs/data-model.md)
+- [Operations](docs/operations.md)
 
 ## 🔗 Live Demo
 ![alt text](image.png)
@@ -14,9 +24,9 @@ https://fintrack-pro-nu.vercel.app/login
 
 ```bash
 npm install
-npx prisma generate
-npx prisma db push
-npx tsx prisma/seed.ts
+npm run db:generate
+npm run db:push
+npm run db:seed
 npm run dev
 ```
 
@@ -31,6 +41,7 @@ Create a `.env` file in the project root (never commit it — it's in `.gitignor
 ```env
 DATABASE_URL="your_postgresql_url_here"   # PostgreSQL — Neon.tech recommended
 JWT_SECRET="your_long_random_string_here" # Any long random string
+DATABASE_SCHEMA="fintrack"                 # Optional; defaults to fintrack
 ```
 
 See `.env.example` for a reference template. For a free PostgreSQL database, create a project at [neon.tech](https://neon.tech) and paste the connection string as `DATABASE_URL`.
@@ -76,9 +87,7 @@ middleware.ts       Route protection — redirects unauthenticated users
 
 **Service layer pattern** — API routes handle HTTP concerns (parsing, status codes). Services handle business logic (balance updates, budget overlap validation). Easier to test and reason about independently.
 
-**Prisma 6 over Prisma 7** — Prisma 7 requires driver adapters for local SQLite which adds operational complexity. Prisma 6 has stable, zero-config SQLite support.
-
-**SQLite for development** — No Docker, no connection strings, no external DB. The seed script creates a realistic 6-month dataset in seconds.
+**PostgreSQL with Prisma 6** — The application uses PostgreSQL. Its tables are isolated in the `fintrack` schema by default, avoiding conflicts when a database instance is shared.
 
 ## Pages
 
