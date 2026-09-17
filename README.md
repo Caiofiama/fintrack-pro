@@ -13,7 +13,7 @@ Use [the documentation hub](docs/README.md) to navigate the project:
 - [Operations](docs/operations.md)
 
 ## 🔗 Live Demo
-![alt text](image.png)
+![FinTrack Pro dashboard preview](docs/assets/fintrack-preview.png)
 https://fintrack-pro-nu.vercel.app/login
 
 **Demo credentials:**
